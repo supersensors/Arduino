@@ -28,6 +28,7 @@ int ambientTemp = 200;
 int counter = 0;
 int peopleCount = 0;
 boolean isMovement = false;
+int numX = 0;
 
 void setup() {
     Serial.begin(9600);
@@ -67,30 +68,41 @@ void loop() {
       }
       
       if((fahrenheit - ambientTemp) > 3 && !isMovement) {
-        Serial.println(ambientTemp);
-        isMovement = true;
-        Serial.println("Person Detected!!!!!!!");
-        Serial.println(peopleCount);
-        peopleCount += 1;
 
-
+        
         for(int i=1; i <= AMG88xx_PIXEL_ARRAY_SIZE; i++){
           int f = pixels[i-1] + (9/5) + 32;
           
           if((f - ambientTemp) > 3) {
+            numX += 1;
             
-            Serial.print("X");
-            Serial.print(", ");
+            if (numX > 3) {
+              //Serial.print("X");
+              //Serial.print(", ");  
+            }
           } else {
-             Serial.print("O");
-             Serial.print(", ");
+             if (numX > 3) {
+              //Serial.print("O");
+              //Serial.print(", "); 
+             }
           }
          
-          if( i%8 == 0 ) Serial.println();
+          //if( i%8 == 0 ) Serial.println();
         }
-        
-        j = 0;
-        break; 
+
+        if (numX > 3) {
+          Serial.println("");
+          isMovement = true;
+          Serial.println("Person Detected!");
+          Serial.println(peopleCount);
+          peopleCount += 1;
+          
+          j = 0;
+          break; 
+        } else {
+          //Serial.println("Not enough X's found");
+          numX = 0;
+        }
       }
 
       if ((fahrenheit - ambientTemp) > 3) {
@@ -101,6 +113,7 @@ void loop() {
       if (j == AMG88xx_PIXEL_ARRAY_SIZE) {
         //Serial.println("++++There is no person detected");
         isMovement = false;
+        numX = 0;
       }
     }
 }
